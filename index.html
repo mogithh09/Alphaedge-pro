@@ -2079,6 +2079,50 @@ setTimeout(() => {
   });
 
 }, 3000);
+
+  // ===== FINAL ACCURATE FIX =====
+
+const STOCK_MAP = {
+  "TATASTEEL": "TATASTEEL.NSE",
+  "TECHM": "TECHM.NSE",
+  "HDFCBANK": "HDFCBANK.NSE",
+  "INFY": "INFY.NSE",
+  "RELIANCE": "RELIANCE.NSE",
+  "ONGC": "ONGC.NSE"
+};
+
+function fixAllCards() {
+
+  document.querySelectorAll("div").forEach(card => {
+
+    const text = card.innerText;
+
+    // check if this card contains a stock name
+    for (let name in STOCK_MAP) {
+
+      if (text.includes(name)) {
+
+        const symbol = STOCK_MAP[name];
+        const price = marketData[symbol];
+
+        if (!price) return;
+
+        // find ₹ -- element inside this card
+        const priceEl = Array.from(card.querySelectorAll("*"))
+          .find(el => el.innerText.includes("₹"));
+
+        if (priceEl) {
+          priceEl.textContent = "₹ " + price;
+        }
+      }
+    }
+
+  });
+
+}
+
+// run every 2 sec
+setInterval(fixAllCards, 2000);
   fetchPrices();
 setInterval(fetchPrices, 10000);
 </script>
