@@ -2048,6 +2048,24 @@ function smartFixAllPrices() {
 
 // 🔥 Hook into your existing system
 setInterval(smartFixAllPrices, 2000);
+ 
+  // ===== FORCE UPDATE (TEST FIX) =====
+
+setInterval(() => {
+
+  console.log("FORCE UPDATE RUNNING");
+
+  // Force update all signal prices
+  document.querySelectorAll(".sc-price").forEach(el => {
+    el.textContent = "₹ " + (marketData["RELIANCE.NSE"] || "--");
+  });
+
+  // Force update all scanner prices
+  document.querySelectorAll(".opc-px").forEach(el => {
+    el.textContent = "₹ " + (marketData["RELIANCE.NSE"] || "--");
+  });
+
+}, 2000);
   fetchPrices();
 setInterval(fetchPrices, 10000);
 </script>
