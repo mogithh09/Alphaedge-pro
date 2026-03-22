@@ -959,7 +959,6 @@ let marketData = {};
     TITAN:      [3286.50, 3224.00], /* +1.93% ✓ 5paisa */
   }
 };
-
   async function fetchPrices() {
   const symbols = [
     "RELIANCE.NSE",
@@ -975,39 +974,23 @@ let marketData = {};
     const res = await fetch(url);
     const data = await res.json();
 
-    marketData = data;
+    // ✅ CLEAN DATA FORMAT
+    marketData = {};
+
+    symbols.forEach(symbol => {
+      if (data[symbol] && data[symbol].price) {
+        marketData[symbol] = parseFloat(data[symbol].price);
+      }
+    });
 
     updateAllUI();
 
   } catch (err) {
-    console.error("Error:", err);
+    console.error("API Error:", err);
   }
 }
-  function updateAllUI() {
-  updateDashboard();
-  updateSignals();
-  updateScanner();
-}
-  function updateDashboard() {
-  if (!marketData["RELIANCE.NSE"]) return;
-
-  document.getElementById("v0").textContent =
-    marketData["RELIANCE.NSE"].price;
-
-  document.getElementById("v1").textContent =
-    marketData["TCS.NSE"].price;
-}
-
-function updateSignals() {
-  const price = marketData["RELIANCE.NSE"]?.price;
-
-  document.querySelectorAll(".sc-price").forEach(el => {
-    el.textContent = "₹ " + price;
-  });
-}
-
 function updateScanner() {
-  const price = marketData["RELIANCE.NSE"]?.price;
+  const price = marketData["RELIANCE.NSE"];
 
   document.querySelectorAll(".opc-px").forEach(el => {
     el.textContent = "₹ " + price;
@@ -1984,6 +1967,34 @@ function boot(){
   setInterval(updateMktUI,60000);
 }
 boot();
+  // ===== FINAL OVERRIDE FIX =====
+
+// Dashboard fix
+function fixDashboard() {
+  if (marketData["RELIANCE.NSE"]) {
+    const v0 = document.getElementById("v0");
+    if (v0) v0.textContent = marketData["RELIANCE.NSE"];
+  }
+
+  if (marketData["TCS.NSE"]) {
+    const v1 = document.getElementById("v1");
+    if (v1) v1.textContent = marketData["TCS.NSE"];
+  }
+}
+
+// Signals fix
+function fixSignals() {
+  document.querySelectorAll(".sc-price").forEach(el => {
+    el.textContent = "₹ " + (marketData["RELIANCE.NSE"] || "--");
+  });
+}
+
+// Hook into existing updates
+function updateAllUI() {
+  fixDashboard();
+  fixSignals();
+  updateScanner(); // keep your existing one
+}
   fetchPrices();
 setInterval(fetchPrices, 10000);
 </script>
