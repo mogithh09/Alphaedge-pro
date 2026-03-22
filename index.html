@@ -1995,6 +1995,59 @@ function updateAllUI() {
   fixSignals();
   updateScanner(); // keep your existing one
 }
+  // ===== SMART AUTO-FIX (NO SEARCH NEEDED) =====
+
+const STOCK_MAP = {
+  "RELIANCE": "RELIANCE.NSE",
+  "TCS": "TCS.NSE",
+  "HDFC BANK": "HDFCBANK.NSE",
+  "INFY": "INFY.NSE",
+  "ICICI BANK": "ICICIBANK.NSE",
+  "ONGC": "ONGC.NSE",
+  "TATA STEEL": "TATASTEEL.NSE",
+  "SBIN": "SBIN.NSE",
+  "WIPRO": "WIPRO.NSE",
+  "TECHM": "TECHM.NSE"
+};
+
+function smartFixAllPrices() {
+
+  // 🔥 FIX SIGNALS
+  document.querySelectorAll(".sc").forEach(card => {
+    const name = card.querySelector(".sc-name")?.innerText?.trim().toUpperCase();
+    const priceEl = card.querySelector(".sc-price");
+
+    const symbol = STOCK_MAP[name];
+
+    if (symbol && marketData[symbol] && priceEl) {
+      priceEl.textContent = "₹ " + marketData[symbol];
+    }
+  });
+
+  // 🔥 FIX SCANNER
+  document.querySelectorAll(".opc").forEach(card => {
+    const name = card.querySelector(".opc-sym")?.innerText?.trim().toUpperCase();
+    const priceEl = card.querySelector(".opc-px");
+
+    const symbol = STOCK_MAP[name];
+
+    if (symbol && marketData[symbol] && priceEl) {
+      priceEl.textContent = "₹ " + marketData[symbol];
+    }
+  });
+
+  // 🔥 FIX DASHBOARD (top bar)
+  if (marketData["RELIANCE.NSE"]) {
+    document.getElementById("v0").textContent = marketData["RELIANCE.NSE"];
+  }
+
+  if (marketData["TCS.NSE"]) {
+    document.getElementById("v1").textContent = marketData["TCS.NSE"];
+  }
+}
+
+// 🔥 Hook into your existing system
+setInterval(smartFixAllPrices, 2000);
   fetchPrices();
 setInterval(fetchPrices, 10000);
 </script>
