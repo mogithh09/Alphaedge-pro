@@ -920,7 +920,9 @@ body::after{
 /* ══════════════════════════════════════
    SEED DATA — NSE 20 Mar 2026 verified
 ══════════════════════════════════════ */
-const SEED={
+const API_KEY = "6b863704aaa54b6aadea4317e859dae2";
+let marketData = {};
+  const SEED={
   /* Verified NSE closing prices — Friday 20 March 2026
      Sources: 5paisa.com, trendlyne.com, dhan.co, investing.com */
   idx:[
@@ -957,6 +959,60 @@ const SEED={
     TITAN:      [3286.50, 3224.00], /* +1.93% ✓ 5paisa */
   }
 };
+
+  async function fetchPrices() {
+  const symbols = [
+    "RELIANCE.NSE",
+    "TCS.NSE",
+    "HDFCBANK.NSE",
+    "INFY.NSE",
+    "ICICIBANK.NSE"
+  ];
+
+  const url = `https://api.twelvedata.com/price?symbol=${symbols.join(",")}&apikey=${API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    marketData = data;
+
+    updateAllUI();
+
+  } catch (err) {
+    console.error("Error:", err);
+  }
+}
+  function updateAllUI() {
+  updateDashboard();
+  updateSignals();
+  updateScanner();
+}
+  function updateDashboard() {
+  if (!marketData["RELIANCE.NSE"]) return;
+
+  document.getElementById("v0").textContent =
+    marketData["RELIANCE.NSE"].price;
+
+  document.getElementById("v1").textContent =
+    marketData["TCS.NSE"].price;
+}
+
+function updateSignals() {
+  const price = marketData["RELIANCE.NSE"]?.price;
+
+  document.querySelectorAll(".sc-price").forEach(el => {
+    el.textContent = "₹ " + price;
+  });
+}
+
+function updateScanner() {
+  const price = marketData["RELIANCE.NSE"]?.price;
+
+  document.querySelectorAll(".opc-px").forEach(el => {
+    el.textContent = "₹ " + price;
+  });
+}
 
 /* ── STATE ── */
 const spk=[[],[],[]];const pvI=[null,null,null];
@@ -1928,6 +1984,8 @@ function boot(){
   setInterval(updateMktUI,60000);
 }
 boot();
+  fetchPrices();
+setInterval(fetchPrices, 10000);
 </script>
 </body>
 </html>
